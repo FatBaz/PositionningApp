@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
     tools:context="fr.utbm.lo53.p2017.positionningapp.Calibration">
 
     <android.support.design.widget.AppBarLayout
@@ -20,7 +21,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_calibration" />
+    <include layout="@layout/content_calibration"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
