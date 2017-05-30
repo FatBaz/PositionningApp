@@ -1,10 +1,13 @@
 package fr.utbm.lo53.p2017.positionningapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -12,7 +15,7 @@ import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
 
-public class PositioningActivity extends AppCompatActivity {
+public class PositioningActivity extends BaseActivity {
 
     private ImageView alphaBackground;
     private Button buttonStart;
@@ -33,6 +36,14 @@ public class PositioningActivity extends AppCompatActivity {
                 fadeOutAndHideImage();
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        MenuItem item = menu.findItem(R.id.open_calibration_activity);
+        item.setVisible(true);
+        return true;
     }
 
     private void fadeOutAndHideImage() {

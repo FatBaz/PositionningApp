@@ -30,19 +30,19 @@
         android:positiveButtonText="@null"
         android:title="@string/pref_title_add_friends_to_messages" />
     <EditTextPreference
-        android:defaultValue="127.0.0.1"
-        android:key="edit_text_hostname"
+        android:defaultValue="@string/pref_default_hostname"
+        android:key="hostname"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="Hostname" />
+        android:title="@string/pref_title_hostname" />
     <EditTextPreference
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:defaultValue="8080"
-        android:key="edit_text_port"
+        android:defaultValue="@string/default_port"
+        android:key="port"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="Port" />
+        android:title="@string/pref_title_port" />
 
 
 </PreferenceScreen>
