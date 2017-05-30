@@ -7,4 +7,9 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/bt_open_locate_activity"
+        android:icon="@drawable/map_marker"
+        android:orderInCategory="101"
+        android:title="Locate !" />
 </menu>
