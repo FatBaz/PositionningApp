@@ -2,10 +2,12 @@ package fr.utbm.lo53.p2017.positionningapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Layout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,8 +19,7 @@ import android.widget.ImageView;
 
 public class PositioningActivity extends BaseActivity {
 
-    private ImageView alphaBackground;
-    private Button buttonStart;
+    private ConstraintLayout start_layout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,13 +28,13 @@ public class PositioningActivity extends BaseActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        alphaBackground = (ImageView) findViewById(R.id.alpha_background);
-        buttonStart = (Button) findViewById(R.id.button_start);
+        final Animation hideAnimation = createFadeOutAndHideAnimation();
 
-        buttonStart.setOnClickListener(new View.OnClickListener() {
+        start_layout = (ConstraintLayout) findViewById(R.id.start_layout);
+        start_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fadeOutAndHideImage();
+                start_layout.startAnimation(hideAnimation);;
             }
         });
     }
@@ -46,21 +47,20 @@ public class PositioningActivity extends BaseActivity {
         return true;
     }
 
-    private void fadeOutAndHideImage() {
-        Animation fadeOut = new AlphaAnimation(1, 0);
-        fadeOut.setInterpolator(new AccelerateInterpolator());
-        fadeOut.setDuration(1000);
+    private Animation createFadeOutAndHideAnimation() {
+        ImageView hiding_image = (ImageView) findViewById(R.id.hiding_image);
+        float initial_alpha = hiding_image.getImageAlpha();
+        Animation animation = new AlphaAnimation(initial_alpha, 0);
+        animation.setInterpolator(new AccelerateInterpolator());
+        animation.setDuration(1000);
 
-        fadeOut.setAnimationListener(new Animation.AnimationListener() {
+        animation.setAnimationListener(new Animation.AnimationListener() {
             public void onAnimationEnd(Animation animation) {
-                alphaBackground.setVisibility(View.GONE);
-                buttonStart.setVisibility(View.GONE);
+                start_layout.setVisibility(View.GONE);
             }
             public void onAnimationRepeat(Animation animation) {}
             public void onAnimationStart(Animation animation) {}
         });
-
-        alphaBackground.startAnimation(fadeOut);
-        buttonStart.startAnimation(fadeOut);
+        return animation;
     }
 }
