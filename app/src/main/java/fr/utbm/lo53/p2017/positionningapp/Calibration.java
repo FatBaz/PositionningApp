@@ -39,7 +39,7 @@ public class Calibration extends BaseActivity {
         Map.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(motionEvent.getAction()==motionEvent.ACTION_MOVE) {
+                if(motionEvent.getAction()==motionEvent.ACTION_MOVE || motionEvent.getAction()==motionEvent.ACTION_UP) {
                     MapMarker.setVisibility(MapMarker.VISIBLE);
                     Snackbar.make(view, " X : " + motionEvent.getX() + " Y : " + motionEvent.getY(), Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
