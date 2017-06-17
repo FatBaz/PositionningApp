@@ -35,14 +35,17 @@
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="@string/pref_title_hostname" />
+
     <EditTextPreference
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:defaultValue="@string/default_port"
+        android:defaultValue="@string/pref_default_port"
         android:key="port"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="@string/pref_title_port" />
+        android:title="@string/pref_title_port"
+        android:numeric="integer"
+        android:maxLength="5" />
 
 
 </PreferenceScreen>

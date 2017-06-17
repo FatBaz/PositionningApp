@@ -18,8 +18,10 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+
+import org.json.JSONObject;
 
 public class PositioningActivity extends BaseActivity {
 
@@ -33,31 +35,35 @@ public class PositioningActivity extends BaseActivity {
     // Instantiate the RequestQueue.
     private RequestQueue queue;
 
-    private String url = "http://www.google.com";
+    private boolean isLocating = false;
 
     // Request a string response from the provided URL.
-    private StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-            new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    // Display the first 500 characters of the response string.
-                    textView.setText("Response is: "+ response.substring(0,500));
-                }
-            }, new Response.ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            Log.d(TAG, error.getCause().toString());
-            textView.clearComposingText();
-        }
-    });
+    private JsonObjectRequest stringRequest;
 
     private final Handler handler = new Handler();
     private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            // Add the request to the RequestQueue.
+            // Create request
+            stringRequest = new JsonObjectRequest(Request.Method.GET,
+                    getURLSolver().locateURL(),
+                    null,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            textView.setText("Response is: "+ response.toString().substring(0,500));
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    textView.setText("Error: " + error.getMessage());
+                    Log.i(TAG, "Error during location request");
+                }
+            });
+            Log.v(TAG, "" + stringRequest);
             queue.add(stringRequest);
-            handler.postDelayed(this, 1000);
+
+            handler.postDelayed(runnable, 1000);
         }
     };
 
@@ -69,7 +75,7 @@ public class PositioningActivity extends BaseActivity {
         setSupportActionBar(toolbar);
 
         start_layout = (ConstraintLayout) findViewById(R.id.start_layout);
-        hideAnimation = createFadeOutAndHideAnimation();
+        initFadeOutAndHideAnimation();
 
         textView = (TextView) findViewById(R.id.ID_yolo);
 
@@ -77,9 +83,17 @@ public class PositioningActivity extends BaseActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onPause() {
+        super.onPause();
         handler.removeCallbacks(runnable);
-        super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isLocating) {
+            handler.post(runnable);
+        }
     }
 
     @Override
@@ -91,11 +105,17 @@ public class PositioningActivity extends BaseActivity {
     }
 
     public void startLocating(View v) {
+        if (isLocating) {
+            return;
+        }
+
+        isLocating = true;
         start_layout.startAnimation(hideAnimation);
+
         handler.post(runnable);
     }
 
-    private Animation createFadeOutAndHideAnimation() {
+    private void initFadeOutAndHideAnimation() {
         ImageView hiding_image = (ImageView) findViewById(R.id.hiding_image);
         final float initial_alpha = hiding_image.getImageAlpha() / 255;
         Animation animation = new AlphaAnimation(initial_alpha, 0);
@@ -109,6 +129,6 @@ public class PositioningActivity extends BaseActivity {
             public void onAnimationRepeat(Animation animation) {}
             public void onAnimationStart(Animation animation) {}
         });
-        return animation;
+        hideAnimation = animation;
     }
 }
