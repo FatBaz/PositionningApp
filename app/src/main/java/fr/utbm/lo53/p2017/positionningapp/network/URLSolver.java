@@ -63,4 +63,10 @@ public class URLSolver implements SharedPreferences.OnSharedPreferenceChangeList
                 .appendPath("request");
         return b.build().toString();
     }
+
+    public String mapDataURL(int mapId) {
+        Uri.Builder b = baseURL();
+        b.appendPath("static").appendPath("map.png");
+        return b.build().toString();
+    }
 }

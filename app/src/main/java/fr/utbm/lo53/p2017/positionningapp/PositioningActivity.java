@@ -1,5 +1,6 @@
 package fr.utbm.lo53.p2017.positionningapp;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
@@ -18,10 +19,14 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Random;
 
 public class PositioningActivity extends BaseActivity {
 
@@ -29,6 +34,7 @@ public class PositioningActivity extends BaseActivity {
 
     private ConstraintLayout start_layout;
     private TextView textView;
+    private ImageView mapView;
 
     private Animation hideAnimation;
 
@@ -37,31 +43,46 @@ public class PositioningActivity extends BaseActivity {
 
     private boolean isLocating = false;
 
-    // Request a string response from the provided URL.
-    private JsonObjectRequest stringRequest;
+    private Integer mapId = null;
 
     private final Handler handler = new Handler();
     private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
             // Create request
-            stringRequest = new JsonObjectRequest(Request.Method.GET,
+            JsonObjectRequest locateRequest = new JsonObjectRequest(Request.Method.GET,
                     getURLSolver().locateURL(),
                     null,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            textView.setText("Response is: "+ response.toString().substring(0,500));
+                            try {
+                                float x = (float) response.getDouble("x");
+                                float y = (float) response.getDouble("y");
+                                int mapId = response.getInt("map_id");
+                                if (hasCorrectMap(mapId)) {
+                                    putPoint(x, y);
+                                    textView.setText("");
+                                } else {
+                                    getMap(mapId);
+                                }
+                            } catch (JSONException e) {
+                                Log.e(TAG, e.toString());
+                                textView.setText("Could not parse the response !");
+                            }
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    // TODO: Remove random position
+                    Random r = new Random();
+                    putPoint(r.nextFloat(), r.nextFloat());
                     textView.setText("Error: " + error.getMessage());
                     Log.i(TAG, "Error during location request");
                 }
             });
-            Log.v(TAG, "" + stringRequest);
-            queue.add(stringRequest);
+            Log.v(TAG, "" + locateRequest);
+            queue.add(locateRequest);
 
             handler.postDelayed(runnable, 1000);
         }
@@ -78,6 +99,8 @@ public class PositioningActivity extends BaseActivity {
         initFadeOutAndHideAnimation();
 
         textView = (TextView) findViewById(R.id.ID_yolo);
+
+        mapView = (ImageView) findViewById(R.id.map);
 
         queue = Volley.newRequestQueue(this);
     }
@@ -130,5 +153,36 @@ public class PositioningActivity extends BaseActivity {
             public void onAnimationStart(Animation animation) {}
         });
         hideAnimation = animation;
+    }
+
+    private void putPoint(float x, float y) {
+        ImageView mapMarker = (ImageView) findViewById(R.id.map_marker);
+        float x_on_map = (float) mapView.getWidth() * x;    // in px
+        float y_on_map = (float) mapView.getHeight() * y;
+        mapMarker.setX(mapView.getX() + x_on_map - mapMarker.getWidth()/2);
+        mapMarker.setY(mapView.getY() + y_on_map - mapMarker.getHeight());
+        mapMarker.setVisibility(View.VISIBLE);
+    }
+
+    private boolean hasCorrectMap(int mapId) {
+        return (this.mapId != null && this.mapId.equals(mapId));
+    }
+
+    private void getMap(int mapId) {
+        ImageRequest mapRequest = new ImageRequest(
+            getURLSolver().mapDataURL(mapId),
+            new Response.Listener<Bitmap>() {
+                @Override
+                public void onResponse(Bitmap bitmap) {
+                    mapView.setImageBitmap(bitmap);
+                }
+            }, 0, 0, null,
+            new Response.ErrorListener() {
+                public void onErrorResponse(VolleyError error) {
+                    mapView.setImageResource(R.drawable.map2);
+                    textView.setText("Can't load map!!!");
+                }
+        });
+        queue.add(mapRequest);
     }
 }
