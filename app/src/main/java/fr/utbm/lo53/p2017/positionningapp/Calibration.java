@@ -14,7 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 public class Calibration extends BaseActivity {
-
+    float height,width;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -22,15 +22,6 @@ public class Calibration extends BaseActivity {
         setContentView(R.layout.activity_calibration);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Salut ! :) Ce bouton ne sert à rien.", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         final ImageView Map = (ImageView) findViewById(R.id.Map);
         final ImageView MapMarker =  (ImageView) findViewById(R.id.MapMarker);
@@ -42,16 +33,20 @@ public class Calibration extends BaseActivity {
         cancelButton.setVisibility(cancelButton.INVISIBLE);
         measureButton.setVisibility(measureButton.INVISIBLE);
 
+        //Map.setMaxHeight(50);
+
         Map.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 /*motionEvent.getAction()==motionEvent.ACTION_MOVE &&*/
                 if( setPointButton.getVisibility() == setPointButton.INVISIBLE && motionEvent.getX() <= Map.getWidth() && motionEvent.getY() <= Map.getHeight() && motionEvent.getX() >= 0 && motionEvent.getY() >= 0) {
                     MapMarker.setVisibility(MapMarker.VISIBLE);
-                    Snackbar.make(view, " X : " + motionEvent.getX() + " Y : " + motionEvent.getY(), Snackbar.LENGTH_LONG)
+                    height = motionEvent.getX();
+                    width = motionEvent.getY();
+                    Snackbar.make(view, " X : " + height + " Y : " + width, Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
-                    MapMarker.setX(motionEvent.getX()-(MapMarker.getWidth()/4));
-                    MapMarker.setY(motionEvent.getY());
+                    MapMarker.setX(motionEvent.getX()- (view.getWidth()- Map.getWidth())/2 -40);//- MapMarker.getWidth()/2);
+                    MapMarker.setY(motionEvent.getY()+ (view.getHeight()/5));//+(MapMarker.getWidth()/(5/4)));
                 }
                 return true;
             }
@@ -84,7 +79,7 @@ public class Calibration extends BaseActivity {
             }
         });
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -93,18 +88,8 @@ public class Calibration extends BaseActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+    public void sendCalibrateRequest(View v) {
+        Snackbar.make(v, "Coucou, X :" + height + " Y : " + width, Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
     }
 }
