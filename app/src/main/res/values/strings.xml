@@ -64,6 +64,12 @@
         <item>3</item>
     </string-array>
 
+    <string-array name="map_choices">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
     <string-array name="multi_select_list_preference_default_value" />
 
     <string name="pref_title_system_sync_settings">System sync settings</string>

@@ -40,7 +40,7 @@ public class URLSolver implements SharedPreferences.OnSharedPreferenceChangeList
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         switch (key) {
             case HOSTNAME_KEY:  updateHostname(sharedPreferences); break;
-            case PORT_KEY:      updateHostname(sharedPreferences); break;
+            case PORT_KEY:      updatePort(sharedPreferences); break;
         }
     }
 
@@ -57,10 +57,13 @@ public class URLSolver implements SharedPreferences.OnSharedPreferenceChangeList
         return b.build().toString();
     }
 
-    public String calibrateURL() {
+    public String calibrateURL(float x, float y, long map_id) {
         Uri.Builder b = baseURL();
         b.appendPath("calibration")
-                .appendPath("request");
+                .appendPath("request")
+                .appendQueryParameter("x", String.format("%f",x))
+                .appendQueryParameter("y", String.format("%f",y))
+                .appendQueryParameter("map_id", String.format("%d", map_id));
         return b.build().toString();
     }
 
