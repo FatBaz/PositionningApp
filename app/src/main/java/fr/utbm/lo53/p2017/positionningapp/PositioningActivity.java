@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -16,8 +17,9 @@ import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -41,8 +43,8 @@ public class PositioningActivity extends BaseActivity {
     private static final String TAG = "PositioningActivity";
 
     private ConstraintLayout start_layout;
-    private TextView textView;
     private ImageView mapView;
+    private ImageView imageLoading;
 
     private Animation hideAnimation;
 
@@ -67,16 +69,15 @@ public class PositioningActivity extends BaseActivity {
                             try {
                                 float x = (float) response.getDouble("x");
                                 float y = (float) response.getDouble("y");
-                                int mapId = response.getInt("map_id");
+                                int mapId = response.getInt("map");
+                                imageLoading.setVisibility(View.GONE);
                                 if (hasCorrectMap(mapId)) {
                                     putPoint(x, y);
-                                    textView.setText("");
                                 } else {
                                     getMap(mapId);
                                 }
                             } catch (JSONException e) {
-                                Log.e(TAG, e.toString());
-                                textView.setText("Could not parse the response !");
+                                Log.e(TAG, "Could not parse the response: " + e.toString());
                             }
                         }
                     }, new Response.ErrorListener() {
@@ -85,8 +86,7 @@ public class PositioningActivity extends BaseActivity {
                     // TODO: Remove random position
                     Random r = new Random();
                     putPoint(r.nextFloat(), r.nextFloat());
-                    textView.setText("Error: " + error.getMessage());
-                    Log.i(TAG, "Error during location request");
+                    Snackbar.make(mapView, "Error during positioning request", Snackbar.LENGTH_LONG).show();
                 }
             });
             Log.v(TAG, "" + locateRequest);
@@ -106,9 +106,9 @@ public class PositioningActivity extends BaseActivity {
         start_layout = (ConstraintLayout) findViewById(R.id.start_layout);
         initFadeOutAndHideAnimation();
 
-        textView = (TextView) findViewById(R.id.ID_yolo);
-
         mapView = (ImageView) findViewById(R.id.map);
+
+        imageLoading = (ImageView) findViewById(R.id.img_loading);
 
         queue = Volley.newRequestQueue(this);
     }
@@ -140,8 +140,13 @@ public class PositioningActivity extends BaseActivity {
         if (isLocating) {
             return;
         }
-
         isLocating = true;
+
+        final Animation rotate = AnimationUtils.loadAnimation(this, R.anim.rotate);
+        rotate.setDuration(1500);
+        imageLoading.setVisibility(View.VISIBLE);
+        imageLoading.startAnimation(rotate);
+
         start_layout.startAnimation(hideAnimation);
 
         handler.post(runnable);
@@ -179,19 +184,22 @@ public class PositioningActivity extends BaseActivity {
     }
 
     private void getMap(int mapId) {
+        mapView.setVisibility(mapView.INVISIBLE);
         ImageRequest mapRequest = new ImageRequest(
-            getURLSolver().mapDataURL(mapId),
+            getURLSolver().mapBytesURL(mapId),
             new Response.Listener<Bitmap>() {
                 @Override
                 public void onResponse(Bitmap bitmap) {
                     mapView.setImageBitmap(bitmap);
                     mapView.setVisibility(mapView.VISIBLE);
+                    Snackbar.make(mapView, "You need to set a point before measurement.", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 }
             }, 0, 0, null,
             new Response.ErrorListener() {
                 public void onErrorResponse(VolleyError error) {
-                    mapView.setImageResource(R.drawable.map2);
-                    textView.setText("Can't load map!!!");
+                    Snackbar.make(mapView, "Can't load map !", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 }
         });
         queue.add(mapRequest);

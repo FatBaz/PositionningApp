@@ -46,14 +46,14 @@ public class URLSolver implements SharedPreferences.OnSharedPreferenceChangeList
 
     private Uri.Builder baseURL() {
         Uri.Builder builder = new Uri.Builder();
-        return builder.scheme("http").encodedAuthority(hostname + ":" + port);
+        return builder.scheme("http").encodedAuthority(hostname + ":" + port).appendPath("positioning_server");
     }
 
     public String locateURL(String mac) {
         Uri.Builder b = baseURL();
         b.appendPath("positioning")
                 .appendPath("request")
-                .appendQueryParameter("mac", mac);
+                .appendQueryParameter("CLIENT_MAC_ADDR", mac);
         return b.build().toString();
     }
 
@@ -67,9 +67,11 @@ public class URLSolver implements SharedPreferences.OnSharedPreferenceChangeList
         return b.build().toString();
     }
 
-    public String mapDataURL(int mapId) {
+    public String mapBytesURL(int mapId) {
         Uri.Builder b = baseURL();
-        b.appendPath("static").appendPath("map.png");
+        b.appendPath("map")
+                .appendPath("byte")
+                .appendQueryParameter("MAP_ID", String.format("%d", mapId));
         return b.build().toString();
     }
 }
