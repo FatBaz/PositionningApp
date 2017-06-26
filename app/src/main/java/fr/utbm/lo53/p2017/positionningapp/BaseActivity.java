@@ -1,12 +1,21 @@
 package fr.utbm.lo53.p2017.positionningapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Collections;
+import java.util.List;
 
 import fr.utbm.lo53.p2017.positionningapp.network.URLSolver;
 
@@ -69,6 +78,42 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public URLSolver getURLSolver() {
         return urlSolver;
+    }
+
+    protected String getMacAddress() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            // Get MAC address prior to android 6.0
+            WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            WifiInfo wInfo = wifiManager.getConnectionInfo();
+            return wInfo.getMacAddress();
+        } else {
+            // Removed in Android 6.0 -> manually get MAC address
+            try {
+                List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());
+                for (NetworkInterface nif : all) {
+                    if (!nif.getName().equalsIgnoreCase("wlan0")) continue;
+
+                    byte[] macBytes = nif.getHardwareAddress();
+                    if (macBytes == null) {
+                        return "";
+                    }
+
+                    StringBuilder res1 = new StringBuilder();
+                    for (byte b : macBytes) {
+                        //res1.append(Integer.toHexString(b & 0xFF) + ":");
+                        res1.append(String.format("%02X:", b));
+                    }
+
+                    if (res1.length() > 0) {
+                        res1.deleteCharAt(res1.length() - 1);
+                    }
+                    return res1.toString();
+                }
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
+            return "02:00:00:00:00:00";
+        }
     }
 
 }

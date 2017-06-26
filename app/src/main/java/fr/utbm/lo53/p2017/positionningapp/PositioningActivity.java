@@ -176,7 +176,7 @@ public class PositioningActivity extends BaseActivity {
         mapMarker.setX(mapView.getX() + x_on_map - mapMarker.getWidth()/2);
         mapMarker.setY(mapView.getY() + y_on_map - mapMarker.getHeight());
         mapMarker.setVisibility(View.VISIBLE);
-        mapView.setVisibility(mapView.VISIBLE);
+        mapView.setVisibility(View.VISIBLE);
     }
 
     private boolean hasCorrectMap(int mapId) {
@@ -184,14 +184,14 @@ public class PositioningActivity extends BaseActivity {
     }
 
     private void getMap(int mapId) {
-        mapView.setVisibility(mapView.INVISIBLE);
+        mapView.setVisibility(View.INVISIBLE);
         ImageRequest mapRequest = new ImageRequest(
             getURLSolver().mapBytesURL(mapId),
             new Response.Listener<Bitmap>() {
                 @Override
                 public void onResponse(Bitmap bitmap) {
                     mapView.setImageBitmap(bitmap);
-                    mapView.setVisibility(mapView.VISIBLE);
+                    mapView.setVisibility(View.VISIBLE);
                     Snackbar.make(mapView, "You need to set a point before measurement.", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
@@ -203,41 +203,5 @@ public class PositioningActivity extends BaseActivity {
                 }
         });
         queue.add(mapRequest);
-    }
-
-    protected String getMacAddress() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            // Get MAC address prior to android 6.0
-            WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            WifiInfo wInfo = wifiManager.getConnectionInfo();
-            return wInfo.getMacAddress();
-        } else {
-            // Removed in Android 6.0 -> manually get MAC address
-            try {
-                List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());
-                for (NetworkInterface nif : all) {
-                    if (!nif.getName().equalsIgnoreCase("wlan0")) continue;
-
-                    byte[] macBytes = nif.getHardwareAddress();
-                    if (macBytes == null) {
-                        return "";
-                    }
-
-                    StringBuilder res1 = new StringBuilder();
-                    for (byte b : macBytes) {
-                        //res1.append(Integer.toHexString(b & 0xFF) + ":");
-                        res1.append(String.format("%02X:", b));
-                    }
-
-                    if (res1.length() > 0) {
-                        res1.deleteCharAt(res1.length() - 1);
-                    }
-                    return res1.toString();
-                }
-            } catch (SocketException e) {
-                e.printStackTrace();
-            }
-            return "02:00:00:00:00:00";
-        }
     }
 }

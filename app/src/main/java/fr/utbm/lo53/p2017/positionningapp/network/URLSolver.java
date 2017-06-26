@@ -57,13 +57,14 @@ public class URLSolver implements SharedPreferences.OnSharedPreferenceChangeList
         return b.build().toString();
     }
 
-    public String calibrateURL(float x, float y, long map_id) {
+    public String calibrateURL(String mac, float x, float y, long map_id) {
         Uri.Builder b = baseURL();
         b.appendPath("calibration")
                 .appendPath("request")
-                .appendQueryParameter("x", String.format("%f",x))
-                .appendQueryParameter("y", String.format("%f",y))
-                .appendQueryParameter("map_id", String.format("%d", map_id));
+                .appendQueryParameter("X", String.format("%f",x))
+                .appendQueryParameter("Y", String.format("%f",y))
+                .appendQueryParameter("CLIENT_MAC_ADDR", mac)
+                .appendQueryParameter("MAP_ID", String.format("%d", map_id));
         return b.build().toString();
     }
 

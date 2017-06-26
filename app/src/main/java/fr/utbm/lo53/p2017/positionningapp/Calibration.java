@@ -52,11 +52,11 @@ public class Calibration extends BaseActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
-        Map.setVisibility(Map.INVISIBLE);
-        setPointButton.setVisibility(setPointButton.INVISIBLE);
-        MapMarker.setVisibility(MapMarker.INVISIBLE);
-        cancelButton.setVisibility(cancelButton.INVISIBLE);
-        measureButton.setVisibility(measureButton.INVISIBLE);
+        Map.setVisibility(View.INVISIBLE);
+        setPointButton.setVisibility(View.INVISIBLE);
+        MapMarker.setVisibility(View.INVISIBLE);
+        cancelButton.setVisibility(View.INVISIBLE);
+        measureButton.setVisibility(View.INVISIBLE);
 
         //Map.setMaxHeight(50);
 
@@ -64,8 +64,8 @@ public class Calibration extends BaseActivity {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 /*motionEvent.getAction()==motionEvent.ACTION_MOVE &&*/
-                if( setPointButton.getVisibility() == setPointButton.INVISIBLE && motionEvent.getX() <= Map.getWidth() && motionEvent.getY() <= Map.getHeight() && motionEvent.getX() >= 0 && motionEvent.getY() >= 0) {
-                    MapMarker.setVisibility(MapMarker.VISIBLE);
+                if( setPointButton.getVisibility() == View.INVISIBLE && motionEvent.getX() <= Map.getWidth() && motionEvent.getY() <= Map.getHeight() && motionEvent.getX() >= 0 && motionEvent.getY() >= 0) {
+                    MapMarker.setVisibility(View.VISIBLE);
                     width = motionEvent.getX() / Map.getWidth();
                     height = motionEvent.getY() / Map.getHeight();
                     /*Snackbar.make(view, " X : " + height + " Y : " + width, Snackbar.LENGTH_LONG)
@@ -81,20 +81,20 @@ public class Calibration extends BaseActivity {
         setPointButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setPointButton.setVisibility(setPointButton.INVISIBLE);
-                cancelButton.setVisibility(cancelButton.VISIBLE);
-                measureButton.setVisibility(measureButton.VISIBLE);
-                spinner.setVisibility(spinner.INVISIBLE);
+                setPointButton.setVisibility(View.INVISIBLE);
+                cancelButton.setVisibility(View.VISIBLE);
+                measureButton.setVisibility(View.VISIBLE);
+                spinner.setVisibility(View.INVISIBLE);
             }
         });
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setPointButton.setVisibility(setPointButton.VISIBLE);
-                cancelButton.setVisibility(cancelButton.INVISIBLE);
-                measureButton.setVisibility(measureButton.INVISIBLE);
-                MapMarker.setVisibility(MapMarker.INVISIBLE);
-                spinner.setVisibility(spinner.VISIBLE);
+                setPointButton.setVisibility(View.VISIBLE);
+                cancelButton.setVisibility(View.INVISIBLE);
+                measureButton.setVisibility(View.INVISIBLE);
+                MapMarker.setVisibility(View.INVISIBLE);
+                spinner.setVisibility(View.VISIBLE);
             }
         });
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -102,14 +102,14 @@ public class Calibration extends BaseActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.i(TAG, String.format("Pos: %d, ID %d", position, id));
                 map_id = id;
-                Map.setVisibility(Map.VISIBLE);
-                setPointButton.setVisibility(setPointButton.VISIBLE);
+                Map.setVisibility(View.VISIBLE);
+                setPointButton.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                Map.setVisibility(Map.INVISIBLE);
-                setPointButton.setVisibility(setPointButton.INVISIBLE);
+                Map.setVisibility(View.INVISIBLE);
+                setPointButton.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -123,11 +123,11 @@ public class Calibration extends BaseActivity {
     }
 
     public void sendCalibrateRequest(final View v) {
-        if(MapMarker.getVisibility()==MapMarker.INVISIBLE) {
+        if(MapMarker.getVisibility()== View.INVISIBLE) {
             Snackbar.make(v, "You need to set a point before measurement.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
         } else {
-            JsonRequest request = new JsonObjectRequest(Request.Method.GET,getURLSolver().calibrateURL(width,height,map_id),null,
+            JsonRequest request = new JsonObjectRequest(Request.Method.GET,getURLSolver().calibrateURL(getMacAddress(), width,height,map_id),null,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
