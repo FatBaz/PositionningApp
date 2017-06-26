@@ -1,6 +1,10 @@
 package fr.utbm.lo53.p2017.positionningapp;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
@@ -26,6 +30,10 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public class PositioningActivity extends BaseActivity {
@@ -51,7 +59,7 @@ public class PositioningActivity extends BaseActivity {
         public void run() {
             // Create request
             JsonObjectRequest locateRequest = new JsonObjectRequest(Request.Method.GET,
-                    getURLSolver().locateURL(),
+                    getURLSolver().locateURL(getMacAddress()),
                     null,
                     new Response.Listener<JSONObject>() {
                         @Override
@@ -128,6 +136,7 @@ public class PositioningActivity extends BaseActivity {
     }
 
     public void startLocating(View v) {
+        Log.i(TAG, v.toString());
         if (isLocating) {
             return;
         }
@@ -162,6 +171,7 @@ public class PositioningActivity extends BaseActivity {
         mapMarker.setX(mapView.getX() + x_on_map - mapMarker.getWidth()/2);
         mapMarker.setY(mapView.getY() + y_on_map - mapMarker.getHeight());
         mapMarker.setVisibility(View.VISIBLE);
+        mapView.setVisibility(mapView.VISIBLE);
     }
 
     private boolean hasCorrectMap(int mapId) {
@@ -175,6 +185,7 @@ public class PositioningActivity extends BaseActivity {
                 @Override
                 public void onResponse(Bitmap bitmap) {
                     mapView.setImageBitmap(bitmap);
+                    mapView.setVisibility(mapView.VISIBLE);
                 }
             }, 0, 0, null,
             new Response.ErrorListener() {
@@ -184,5 +195,41 @@ public class PositioningActivity extends BaseActivity {
                 }
         });
         queue.add(mapRequest);
+    }
+
+    protected String getMacAddress() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            // Get MAC address prior to android 6.0
+            WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            WifiInfo wInfo = wifiManager.getConnectionInfo();
+            return wInfo.getMacAddress();
+        } else {
+            // Removed in Android 6.0 -> manually get MAC address
+            try {
+                List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());
+                for (NetworkInterface nif : all) {
+                    if (!nif.getName().equalsIgnoreCase("wlan0")) continue;
+
+                    byte[] macBytes = nif.getHardwareAddress();
+                    if (macBytes == null) {
+                        return "";
+                    }
+
+                    StringBuilder res1 = new StringBuilder();
+                    for (byte b : macBytes) {
+                        //res1.append(Integer.toHexString(b & 0xFF) + ":");
+                        res1.append(String.format("%02X:", b));
+                    }
+
+                    if (res1.length() > 0) {
+                        res1.deleteCharAt(res1.length() - 1);
+                    }
+                    return res1.toString();
+                }
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
+            return "02:00:00:00:00:00";
+        }
     }
 }

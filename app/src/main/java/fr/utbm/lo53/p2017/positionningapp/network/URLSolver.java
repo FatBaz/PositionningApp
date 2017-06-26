@@ -49,11 +49,11 @@ public class URLSolver implements SharedPreferences.OnSharedPreferenceChangeList
         return builder.scheme("http").encodedAuthority(hostname + ":" + port);
     }
 
-    public String locateURL(/* TODO: mac ... */) {
+    public String locateURL(String mac) {
         Uri.Builder b = baseURL();
         b.appendPath("positioning")
                 .appendPath("request")
-                .appendQueryParameter("mac", "TODO"); // TODO
+                .appendQueryParameter("mac", mac);
         return b.build().toString();
     }
 
