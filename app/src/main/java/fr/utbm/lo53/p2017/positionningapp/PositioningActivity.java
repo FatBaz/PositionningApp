@@ -1,10 +1,6 @@
 package fr.utbm.lo53.p2017.positionningapp;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
@@ -18,7 +14,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 
 import com.android.volley.Request;
@@ -32,10 +27,6 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 public class PositioningActivity extends BaseActivity {
@@ -183,13 +174,14 @@ public class PositioningActivity extends BaseActivity {
         return (this.mapId != null && this.mapId.equals(mapId));
     }
 
-    private void getMap(int mapId) {
+    private void getMap(final int mapId) {
         mapView.setVisibility(View.INVISIBLE);
         ImageRequest mapRequest = new ImageRequest(
             getURLSolver().mapBytesURL(mapId),
             new Response.Listener<Bitmap>() {
                 @Override
                 public void onResponse(Bitmap bitmap) {
+                    PositioningActivity.this.mapId = mapId;
                     mapView.setImageBitmap(bitmap);
                     mapView.setVisibility(View.VISIBLE);
                     Snackbar.make(mapView, "You need to set a point before measurement.", Snackbar.LENGTH_LONG)
