@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
 
+import java.util.Locale;
+
 public class URLSolver implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = "URLSolver;";
@@ -61,8 +63,8 @@ public class URLSolver implements SharedPreferences.OnSharedPreferenceChangeList
         Uri.Builder b = baseURL();
         b.appendPath("calibration")
                 .appendPath("request")
-                .appendQueryParameter("X", String.format("%f",x))
-                .appendQueryParameter("Y", String.format("%f",y))
+                .appendQueryParameter("X", String.format(Locale.US, "%f",x))
+                .appendQueryParameter("Y", String.format(Locale.US, "%f",y))
                 .appendQueryParameter("CLIENT_MAC_ADDR", mac)
                 .appendQueryParameter("MAP_ID", String.format("%d", map_id));
         return b.build().toString();
