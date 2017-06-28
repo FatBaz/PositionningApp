@@ -44,7 +44,7 @@ public class PositioningActivity extends BaseActivity {
 
     private boolean isLocating = false;
 
-    private Integer mapId = null;
+    private int mapId = 0;
 
     private final Handler handler = new Handler();
     private final Runnable runnable = new Runnable() {
@@ -61,7 +61,6 @@ public class PositioningActivity extends BaseActivity {
                                 float x = (float) response.getDouble("x");
                                 float y = (float) response.getDouble("y");
                                 int mapId = response.getInt("map");
-                                imageLoading.setVisibility(View.GONE);
                                 if (hasCorrectMap(mapId)) {
                                     putPoint(x, y);
                                 } else {
@@ -74,10 +73,7 @@ public class PositioningActivity extends BaseActivity {
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    // TODO: Remove random position
-                    Random r = new Random();
-                    putPoint(r.nextFloat(), r.nextFloat());
-                    Snackbar.make(mapView, "Error during positioning request", Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(mapView, "Error during positioning request", Snackbar.LENGTH_LONG).show();
                 }
             });
             Log.v(TAG, "" + locateRequest);
@@ -167,15 +163,16 @@ public class PositioningActivity extends BaseActivity {
         mapMarker.setX(mapView.getX() + x_on_map - mapMarker.getWidth()/2);
         mapMarker.setY(mapView.getY() + y_on_map - mapMarker.getHeight());
         mapMarker.setVisibility(View.VISIBLE);
-        mapView.setVisibility(View.VISIBLE);
+        imageLoading.setVisibility(View.INVISIBLE);
     }
 
     private boolean hasCorrectMap(int mapId) {
-        return (this.mapId != null && this.mapId.equals(mapId));
+        return this.mapId == mapId;
     }
 
     private void getMap(final int mapId) {
-        mapView.setVisibility(View.INVISIBLE);
+        imageLoading.clearAnimation();
+        imageLoading.setVisibility(View.INVISIBLE);
         ImageRequest mapRequest = new ImageRequest(
             getURLSolver().mapBytesURL(mapId),
             new Response.Listener<Bitmap>() {
@@ -190,7 +187,10 @@ public class PositioningActivity extends BaseActivity {
             }, 0, 0, null,
             new Response.ErrorListener() {
                 public void onErrorResponse(VolleyError error) {
-                    Snackbar.make(mapView, "Can't load map !", Snackbar.LENGTH_LONG)
+                    PositioningActivity.this.mapId = 1;
+                    mapView.setImageResource(R.drawable.map);
+                    mapView.setVisibility(View.VISIBLE);
+                    Snackbar.make(mapView, "Loading default map...", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
         });

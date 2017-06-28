@@ -97,4 +97,6 @@
     <string name="Cancel">Cancel</string>
     <string name="Measure">Measure</string>
     <string name="start_locating">Start locating</string>
+
+    <string name="txt_select_floor">Select your actual floor: </string>
 </resources>
